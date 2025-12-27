@@ -8,6 +8,15 @@ A small IoT project to control a water pump via Wi-Fi using an ESP8266. The pump
 - Simple JSON response for app integration
 - Wi-Fi credentials separated in `config.h` for security
 
+## Component Repositories
+
+- Android App 
+ https://github.com/xlcMitchell/WaterPumpApp
+  
+
+- ESP8266 Firmware (MQTT Subscriber & Pump Control)  
+  https://github.com/xlcMitchell/WaterPumpServer1.0
+
 ## Setup Instructions
 1. Copy `config.example.h` to `config.h` and fill in your Wi-Fi credentials.
 2. Open the sketch in Arduino IDE.
