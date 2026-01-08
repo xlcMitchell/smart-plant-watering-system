@@ -73,6 +73,86 @@
 - Verify pinouts using continuity before power-up
 - Power ESP via USB for initial validation
 
+# Power & Stability Testing - Root Cause Investigation
+
+This section documents the testing performed to diagnose instability in the ESP8266 water pump system, including cases where the pump only operated once or twice, failed to turn off correctly, or caused the ESP8266 to reset.
+
+---
+
+## Test Environment
+- ESP8266 dev board
+- Relay-controlled DC water pump
+- MQTT control via HiveMQ
+- Linear regulator: LM7805
+- Common ground between logic and pump
+- Multiple power sources tested
+
+---
+
+## Test Group A - 9V PP3 Battery
+
+### Tests
+- [x] Measure battery voltage with no load
+- [x] Measure battery voltage under system load
+- [x] Trigger pump via MQTT
+- [x] Observe ESP8266 LED behaviour
+- [x] Observe relay behaviour
+- [x] Observe pump run duration
+
+### Observations
+- Battery measured ~9V unloaded
+- Voltage collapsed significantly under load
+- ESP8266 reset observed (LED flash)
+- Relay produced buzzing / chattering noise
+- Pump ran longer than intended or unpredictably
+
+### Conclusion
+Rectangular 9V PP3 battery cannot supply sufficient current. High internal resistance causes voltage sag, brownouts, ESP resets, and relay instability.
+
+---
+
+## Test Group B - 12V DC Supply + LM7805
+
+### Tests
+- [x] Power system using 12V DC adapter
+- [x] Trigger pump multiple times via MQTT
+- [x] Monitor regulator temperature
+- [x] Observe ESP reset behaviour
+
+### Observations
+- System worked once or twice, then became unstable
+- LM7805 became excessively hot
+- ESP8266 reset after pump activation
+- Required power cycle to recover
+
+### Conclusion
+12V input causes excessive power dissipation in the LM7805. Thermal stress and voltage sag lead to brownouts and unstable operation.
+
+---
+
+
+## Root Cause Summary
+- ESP8266 requires high transient current for Wi-Fi transmission
+- Inadequate current delivery causes voltage sag and brownouts
+- Linear regulation from high input voltage leads to overheating
+- Power instability results in resets, relay chatter, and timing failures
+
+---
+
+## Final Conclusion
+System instability was caused by **power delivery limitations**, not firmware logic. Reliable operation requires:
+- DC power supply rated ≥500mA (1A preferred)
+- Reduced regulator dissipation (lower input voltage or buck converter)
+- Proper bulk decoupling near ESP8266 VIN
+
+---
+
+## Recommended Next Steps
+- [ ] Replace LM7805 with DC-DC buck converter
+- [ ] Use regulated DC supply (9–12V) rated ≥1A
+- [ ] Add 470-1000µF capacitor across VIN–GND near ESP8266
+- [ ] Isolate pump power noise from logic where possible
+
 
 ## GPIO & Relay Test
 - [ ] Test the GPIO pin controlling the relay (no pump connected).

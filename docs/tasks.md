@@ -41,9 +41,9 @@ This task list follows an **Agile / iterative approach**. Work is organised into
 - [x] Review hole sizes and tolerances
 - [x] Update silkscreen and pin labels
 - [x] Order revised PCB (v2)
-- [ ] Assemble revised PCB
-- [ ] Solder components
-- [ ] Power-on test (no load)
+- [x] Assemble revised PCB
+- [x] Solder components
+- [x] Power-on test (no load)
 
 **Done when:** PCB v2 powers correctly
 
