@@ -1,13 +1,5 @@
 # ESP8266 Water Pump Controller
 
-## Project Overview
-A small IoT project to control a water pump via Wi-Fi using an ESP8266. The pump automatically runs for 2 seconds when triggered by an HTTP request.
-
-## Features
-- Turn the water pump on for 2 seconds
-- Simple JSON response for app integration
-- Wi-Fi credentials separated in `config.h` for security
-
 ## Component Repositories
 
 - Android App 
@@ -17,12 +9,48 @@ A small IoT project to control a water pump via Wi-Fi using an ESP8266. The pump
 - ESP8266 Firmware (MQTT Subscriber & Pump Control)  
   https://github.com/xlcMitchell/WaterPumpServer1.0
 
-## Setup Instructions
-1. Copy `config.example.h` to `config.h` and fill in your Wi-Fi credentials.
-2. Open the sketch in Arduino IDE.
-3. Upload it to an ESP8266 board.
-4. Send MQTT message  plant/pump/on  to trigger the pump.
 
+
+## Overview
+This repository contains the **ESP8266 firmware** for a smart plant watering system.  
+The ESP8266 connects to Wi-Fi, subscribes to MQTT commands via **HiveMQ Cloud (TLS)**, and controls a water pump through a relay.
+
+The pump is activated remotely by publishing an MQTT command and is automatically switched off after a fixed duration as a safety measure.
+
+This firmware is part of a larger **end-to-end IoT system** that includes an Android app and system-level documentation.
+
+---
+
+## System Behaviour
+- ESP8266 connects to Wi-Fi on boot
+- Securely connects to HiveMQ Cloud using MQTT over TLS (port 8883)
+- Subscribes to pump command topic
+- Activates pump for a predefined duration
+
+---
+
+## Features
+- MQTT-based remote pump control
+- Secure TLS connection to HiveMQ Cloud
+- Automatic pump shut-off (safety timeout)
+- Credentials isolated in `config.h` (excluded from Git)
+
+---
+
+## MQTT Topics
+| Topic | Direction | Description |
+|------|----------|------------|
+| `plant/pump/on` | App > ESP8266 | Pump control command (`on`) |
+
+
+---
+
+## Hardware Overview
+- ESP8266 Dev Board
+- Relay module (pump switching)
+- External DC power supply
+- Linear regulator (LM7805) for onboard 5V regulation
+- Common ground shared between ESP8266 and pump control circuitry
 
 ## Demo
 [![Pump Demo](images/demo.png)](https://youtu.be/YourVideoID)

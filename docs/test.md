@@ -1,3 +1,8 @@
+## Wi-Fi & MQTT Connection Test
+- [x] Upload the firmware to the ESP8266.
+- [x] Verify Wi-Fi connection on the Serial Monitor.
+- [x] Verify MQTT connection and subscription to `plant/#`.
+
 ### Communication and Network Testing
 
 | Test ID | Test Description | Test Steps | Expected Result | Actual Result | Status |
@@ -21,10 +26,6 @@
 - [x] Confirm correct orientation of all components (e.g., polarized components like capacitors or diodes).
 - [x] Ensure the ESP8266 is seated correctly with proper pin alignment.
 
-
-Mitchell Travis <kiwitiendatm@gmail.com>
-4:36 PM (0 minutes ago)
-to me
 
 # ESP8266 Power Debugging – Test Summary
 
@@ -71,12 +72,7 @@ to me
 - Remove incorrect ground connection
 - Verify pinouts using continuity before power-up
 - Power ESP via USB for initial validation
-- Redesign power stage using a buck converter instead of a linear regulator
 
-## Wi-Fi & MQTT Connection Test
-- [ ] Upload the firmware to the ESP8266.
-- [ ] Verify Wi-Fi connection on the Serial Monitor.
-- [ ] Verify MQTT connection and subscription to `plant/#`.
 
 ## GPIO & Relay Test
 - [ ] Test the GPIO pin controlling the relay (no pump connected).
