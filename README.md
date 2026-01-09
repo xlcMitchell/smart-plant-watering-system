@@ -53,7 +53,7 @@ This firmware is part of a larger **end-to-end IoT system** that includes an And
 - Common ground shared between ESP8266 and pump control circuitry
 
 ## Demo
-[![Pump Demo](images/demo.png)](https://youtu.be/YourVideoID)
+[![Demo Video](https://img.youtube.com/vi/ohtixowxciQ/0.jpg)](https://youtu.be/ohtixowxciQ)
 
 - `demo.png` is a screenshot of the pump or app in action.
 - Clicking the image opens the hosted demo video 
