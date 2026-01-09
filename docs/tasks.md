@@ -89,10 +89,9 @@ This task list follows an **Agile / iterative approach**. Work is organised into
 - [x] Connect ESP8266 to Wi-Fi
 - [x] Connect ESP8266 to HiveMQ Cloud (TLS)
 - [x] Subscribe to command topic (`plant/pump/on`)
-- [ ] Parse incoming payloads
-- [ ] Drive relay / pump ON
-- [ ] Implement timed auto-OFF logic
-- [ ] Publish pump state (`plant/pump/state`)
+- [x] Drive relay / pump ON
+- [x] Implement timed auto-OFF logic
+- [x] Publish pump state (`plant/pump/state`)
 - [x] Add reconnect handling
 
 **Done when:** ESP reacts correctly to MQTT commands
@@ -102,12 +101,12 @@ This task list follows an **Agile / iterative approach**. Work is organised into
 ##  Sprint 6 – End-to-End Integration
 **Goal:** Full system operation
 
-- [ ] Android publishes ON command
-- [ ] ESP receives command
-- [ ] Pump activates
-- [ ] Pump auto-shuts off after timeout
-- [ ] State message published back to broker
-- [ ] Observe state in HiveMQ Web Client
+- [x] Android publishes ON command
+- [x] ESP receives command
+- [x] Pump activates
+- [x] Pump auto-shuts off after timeout
+- [x] State message published back to broker
+- [x] Observe state in HiveMQ Web Client
 
 **Done when:** Complete Android → Pump → State loop works
 
