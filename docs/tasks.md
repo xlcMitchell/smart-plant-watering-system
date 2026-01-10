@@ -112,16 +112,41 @@ This task list follows an **Agile / iterative approach**. Work is organised into
 
 ---
 
-##  Sprint 7 – Testing & Validation
-**Goal:** Prove reliability and safety
+# Sprint 7 – Android App (MQTT Subscriber & Status UI)
+**Goal:** Receive MQTT messages and reflect real device state in the UI
 
-- [ ] Test repeated watering commands
-- [ ] Test broker disconnect recovery
-- [ ] Test power cycling ESP8266
-- [ ] Test Android app restart behaviour
-- [ ] Record test results in table
+### MQTT Subscription & Handling
+- [x] Subscribe to pump status topic (`plant/pump/status`)
+- [x] Subscribe to device presence topic (`plant/device/online`)
+- [x] Verify retained messages are received on app startup
+- [x] Parse incoming payloads (`IDLE`, `RUNNING`, `DONE`, `ONLINE`, `OFFLINE`)
+- [x] Log received messages for debugging
+- [x] Handle messages arriving on background thread safely
 
-**Done when:** System behaves predictably under failure
+### UI State Management
+- [x] Add device status indicator (icon or dot)
+- [x] Display device **ONLINE / OFFLINE** state
+- [x] Display pump status text (`Idle`, `Running`, `Completed`)
+- [x] Ensure UI updates occur on main thread
+- [ ] Handle “unknown” state on first launch
+- [ ] Prevent stale UI state after app reconnect
+
+### Connection Awareness
+- [x] Detect Android MQTT client connected/disconnected state
+- [ ] Show “Connecting…” state when broker is unavailable
+- [ ] Differentiate **broker offline vs ESP offline**
+- [ ] Gracefully handle broker reconnects
+
+### Validation
+- [x] Verify ESP ONLINE message updates UI
+- [x] Verify ESP OFFLINE (LWT) updates UI
+- [x] Verify pump RUNNING → DONE transitions
+- [ ] Restart app and confirm retained state restores UI
+- [x] Disconnect ESP Wi-Fi and confirm OFFLINE indicator
+
+**Done when:**  
+Android app accurately reflects **real ESP presence and pump state** in real time and after reconnects.
+
 
 ---
 

@@ -141,18 +141,51 @@ Rectangular 9V PP3 battery cannot supply sufficient current. High internal resis
 
 ## Final Conclusion
 System instability was caused by **power delivery limitations**, not firmware logic. Reliable operation requires:
-- DC power supply rated ≥500mA (1A preferred)
+- DC power supply rated > 500mA (1A preferred)
 - Reduced regulator dissipation (lower input voltage or buck converter)
 - Proper bulk decoupling near ESP8266 VIN
 
 ---
 
-## Recommended Next Steps
-- [ ] Replace LM7805 with DC-DC buck converter
-- [ ] Use regulated DC supply (9–12V) rated ≥1A
-- [ ] Add 470-1000µF capacitor across VIN–GND near ESP8266
-- [ ] Isolate pump power noise from logic where possible
+## Test Group 1: Android App - MQTT Message Receiving
 
+| Test ID | Test Description | Steps Performed | Expected Result | Actual Result | Status | Notes |
+|------|------------------|-----------------|-----------------|---------------|--------|------|
+| APP-01 | Receive pump status message | Publish `plant/pump/status = RUNNING` from ESP / HiveMQ | App receives message and updates pump status text | Pump status received and displayed correctly |  Pass | Status text updates as expected |
+| APP-02 | Receive pump idle/done message | Publish `plant/pump/status = DONE` | App updates pump status text to DONE | Status updated correctly |  Pass | No UI issues observed |
+| APP-03 | Receive device OFFLINE message (LWT) | Disconnect ESP from broker | App receives OFFLINE message | OFFLINE received but delayed |  Partial | Delay likely due to broker/session timing |
+| APP-04 | Receive device ONLINE message | ESP connects to broker | App receives ONLINE message | ONLINE received successfully |  Pass | Retained message works |
+| APP-05 | UI updates on MQTT message | Observe TextView updates on message arrival | Text fields update correctly | Text fields updated correctly |  Pass | UI thread handling confirmed |
+| APP-06 | ESP auto-reconnect visibility | ESP goes offline due to power issue | App shows ESP returning ONLINE | ESP does not reconnect |  Fail | Root cause identified as power instability |
+
+---
+
+## Test Group 2: Power & Hardware Stability - Water Pump Operation
+
+| Test ID | Test Description | Setup | Expected Result | Actual Result | Status | Notes |
+|------|------------------|-------|-----------------|---------------|--------|------|
+| PWR-01 | Pump activation under VIN power | ESP + pump powered from VIN rail | Pump runs, ESP remains online | ESP goes offline after 1-3 activations |  Fail | Indicates voltage sag/brownout |
+| PWR-02 | Repeated pump cycles | Trigger pump multiple times | Stable operation | ESP disconnects | Fail | Failure reproducible |
+| PWR-03 | Add bulk + decoupling capacitors | Added 1000uF electrolytic + 0.1uF ceramic across VIN/GND | Improved stability | No improvement |  Fail | Caps insufficient for sustained sag |
+| PWR-04 | Flyback diode present | Pump has flyback diode | Reduced noise | Still unstable |  Partial | Noise not primary issue |
+| PWR-05 | Separate ESP power (USB) | ESP powered via USB, pump on original supply | Stable operation | Works perfectly |  Pass | Confirms VIN power path as root cause |
+| PWR-06 | ESP reconnect behaviour | ESP powered from VIN after failure | ESP reconnects to MQTT | ESP does not reconnect |  Fail | ESP likely browning out/resetting |
+
+---
+
+## Summary of Findings
+
+- Android app MQTT message receiving and UI updates are functioning correctly.
+- OFFLINE (LWT) messages are received but may be delayed due to broker timing.
+- ESP8266 fails to reconnect after going offline when powered via VIN.
+- Adding capacitors alone did not resolve power instability.
+- Powering the ESP8266 from a separate, stable 5V USB supply completely resolves the issue.
+- Root cause identified as **VIN power rail instability under pump load**.
+
+## Conclusion
+
+The issue is hardware-related (power delivery), not MQTT logic or Android implementation.  
+Recommended fix is to power the ESP8266 from a **dedicated regulated rail (buck converter)** while keeping the pump on the main supply, with a shared ground.
 
 ## GPIO & Relay Test
 - [ ] Test the GPIO pin controlling the relay (no pump connected).
