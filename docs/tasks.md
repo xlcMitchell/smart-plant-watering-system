@@ -147,10 +147,125 @@ This task list follows an **Agile / iterative approach**. Work is organised into
 **Done when:**  
 Android app accurately reflects **real ESP presence and pump state** in real time and after reconnects.
 
+## Sprint 8 – Watering History (Persistence + UI)
+**Goal:** Record and display recent watering events and last-watered time.
+
+### Implementation
+- [x] Create in-memory history list (max N events)
+- [x] Load saved history from SharedPreferences on app start
+- [x] On pump status `DONE`, create a new history entry (timestamp)
+- [x] Insert newest entry at top of list
+- [x] Trim history list to max N entries
+- [x] Save updated history back to SharedPreferences
+- [x] Update UI: Last watered + History display
+
+
+**Done when:** History updates on `DONE`, persists after app restart, and displays correctly.
+
+
+## Sprint – Moisture Sensor Integration (ESP8266 + Android)
+
+**Goal:**  
+Integrate a soil moisture sensor into the system, publish readings via MQTT, and display moisture status in the Android app.
 
 ---
 
-##  Sprint 8 – Documentation & Portfolio Polish
+## Hardware Implementation
+
+- [x] Identify moisture sensor pins (VCC, GND, SIGNAL)
+- [x] Solder wires from moisture sensor to PCB
+- [x] Verify correct power voltage for sensor
+- [x] Confirm common ground between ESP8266 and sensor
+- [x] Inspect solder joints and wire strain relief
+
+**Done when:** Sensor is physically connected and stable on the board
+
+---
+
+## ESP8266 – Sensor Reading & Calibration
+
+- [x] Select ADC pin for moisture sensor input
+- [x] Read raw analog values from sensor
+- [x] Test sensor in dry soil and record ADC value
+- [x] Test sensor in wet soil and record ADC value
+- [x] Determine usable moisture range (min/max)
+- [x] Implement `map()` conversion to percentage (0–100%)
+- [x] Constrain mapped values to valid range
+- [x] Log raw and mapped values for debugging
+
+**Done when:** Sensor readings are stable and mapped correctly
+
+---
+
+## ESP8266 – MQTT Publishing
+
+- [x] Define MQTT topic for moisture data (e.g. `plant/moisture`)
+- [x] Create non-blocking publish method
+- [x] Convert moisture value to string payload
+- [x] Publish moisture value at fixed interval 
+- [x] Ensure publish does not block pump control logic
+- [x] Verify messages appear in HiveMQ Web Client
+
+**Done when:** Moisture values publish reliably to broker
+
+---
+
+## Android App – MQTT Subscription
+
+- [x] Subscribe to moisture topic in MQTT helper
+- [x] Receive moisture payloads from broker
+- [x] Parse moisture value from payload
+- [x] Handle invalid or missing values safely
+- [x] Log received values for debugging
+
+**Done when:** App receives moisture readings consistently
+
+---
+
+## Android App – UI Integration
+
+- [x] Add TextView for moisture percentage
+- [x] Update moisture TextView on message received
+- [x] Ensure UI updates occur on UI thread
+- [x] Confirm existing pump UI remains unaffected
+
+**Done when:** Moisture value is visible and updates in real time
+
+## Sprint 8 – Auto-Watering Iteration 
+**Goal:** Fully working auto-watering with retained config, non-blocking pump control, 24h cooldown, and safe/verified behaviour end-to-end.
+
+### App (Android)
+- [x] Add switch + threshold slider listeners to publish config
+- [x] Publish auto config to `plant/auto/config` as **retained**
+- [x] Add small UI hints: “Auto ON/OFF”, “Threshold: X%”
+
+
+### Firmware (ESP8266)
+- [x] Subscribe to `plant/auto/config` on MQTT connect/reconnect
+- [x] Implement config parsing (`enabled, threshold, durationMs, cooldownMin, hyst, maxPerDay`)
+- [x] Store parsed values in config struct (`cfg`)
+- [x] Update pump timer to use `cfg.durationMs` (not hardcoded `PUMP_MS`)
+- [x] Implement auto decision function `maybeAutoWater(moisturePct)`
+- [x] Add latch/hysteresis reset logic (prevents repeat watering while still low)
+- [x] Enforce **24h cooldown** (millis-based for now)
+- [x] Keep pump control **non-blocking** (no delays)
+- [x] Add serial debug prints for: config received, moisture reading, auto decision reasons (temporary)
+
+### Calibration + Behaviour Tuning
+- [x] Log and confirm RAW → % mapping direction (dry vs wet)
+- [x] Collect 3 baseline readings: air / dry soil / wet soil
+- [x] Set final `RAW_DRY` and `RAW_WET` calibration values
+- [x] Verify threshold behaviour: watering triggers only when `% < threshold`
+
+### Integration Testing (HiveMQ + Real Hardware)
+- [x] Test manual watering still works (button → pump runs → status updates)
+- [x] Test auto watering triggers on low moisture (within next read interval)
+- [x] Confirm cooldown prevents repeated watering within 24h
+- [x] Confirm latch/hysteresis prevents rapid retrigger while moisture stays low
+- [x] Regression check: online/offline LWT still correct
+
+
+##  Sprint 10 – Documentation & Portfolio Polish
 **Goal:** Make project portfolio-ready
 
 - [] Document lessons learned

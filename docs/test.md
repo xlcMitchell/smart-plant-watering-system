@@ -182,10 +182,136 @@ System instability was caused by **power delivery limitations**, not firmware lo
 - Powering the ESP8266 from a separate, stable 5V USB supply completely resolves the issue.
 - Root cause identified as **VIN power rail instability under pump load**.
 
+
 ## Conclusion
 
 The issue is hardware-related (power delivery), not MQTT logic or Android implementation.  
 Recommended fix is to power the ESP8266 from a **dedicated regulated rail (buck converter)** while keeping the pump on the main supply, with a shared ground.
+
+# Testing – Watering History Feature
+
+This test list verifies the **watering history**, **last-watered tracking**, and **persistence** features added to the Android app.
+
+Tests are marked complete only when behaviour is verified in the running system.
+
+---
+
+## History Update Tests
+
+- [x] **H1 – History entry added on DONE**
+  - Trigger watering until pump status becomes `DONE`
+  - Verify a new timestamp entry appears at the top of the history list
+
+- [x] **H2 – Last watered text updates**
+  - Trigger watering until `DONE`
+  - Verify `txtLastRun` displays the latest watering timestamp
+
+- [x] **H3 – History order (newest first)**
+  - Trigger multiple waterings
+  - Verify newest entry appears at the top of the list
+
+- [x] **H4 – History size limit enforced**
+  - Trigger watering more than `HISTORY_MAX` times
+  - Verify history list does not exceed the maximum size
+  - Verify oldest entries are removed first
+
+---
+
+## Persistence Tests
+
+- [x] **H5 – History persists after app restart**
+  - Add 2–3 history entries
+  - Close the app completely
+  - Reopen the app
+  - Verify history list is restored correctly
+
+- [x] **H6 – Last watered persists after app restart**
+  - Add a history entry
+  - Restart the app
+  - Verify `txtLastRun` still displays the latest timestamp
+
+  History working after editing code to save shared preference for history setter method
+
+---
+
+## Edge Case & Reliability Tests
+
+- [x] **H7 – No history entry without DONE**
+  - Send watering command
+  - Force ESP offline before `DONE`
+  - Verify no new history entry is added
+
+- [x] **H8 – No duplicate entries**
+  - Trigger a single watering cycle
+  - Verify only one history entry is added for that cycle
+
+- [x] **H9 – UI thread safety**
+  - Observe app during incoming MQTT messages
+  - Verify no crashes or UI exceptions occur
+
+---
+
+## Regression Tests
+
+- [x] **H10 – Pump control still works**
+  - Verify Water Plant button still sends command correctly
+  - Verify pump activates and stops as expected
+
+- [x] **H11 – Online/Offline indicator unaffected**
+  - Toggle ESP online/offline
+  - Verify status dot and text still update correctly
+
+---
+
+## Definition of Done
+
+This feature is considered complete when:
+
+- [x] History updates only on `DONE`
+- [x] History is capped to the configured maximum size
+- [x] History and last-watered time persist across app restarts
+- [x] UI updates are stable and crash-free
+
+## Auto-Watering + History – Test Log (Current Findings)
+
+### Observations / Notes
+- [x] History sometimes did not show latest entry at top after app restart
+- [x] Reproduced: watered twice, closed app, only one entry retained
+- [x] Root cause found: `apply()`/`commit()` missing in SharedPreferences history setter
+- [x] Auto-watering tested and working
+- [x] Auto-watering triggers after next moisture reading interval (expected)
+- [x] Verified no immediate re-water on next 6-minute reading (cooldown/latch behaving)
+- [x] Moisture rose from ~0% (dry) to ~34% after one watering
+
+---
+
+## Suggested Test Checklist (Next Steps)
+
+### A) History Persistence (App)
+- [x] **Restart ordering check**: Water 3 times (with clear timestamps), force close app, reopen → newest entry appears at top
+- [x] **Cold start after phone restart**: Water once, reboot phone, open app → history + last watered still correct
+- [x] **Rapid close test**: Trigger pump, wait for `DONE`, immediately swipe app away → reopen → history entry present
+- [x] **Max history trim**: Water > `HISTORY_MAX` times → verify list trims oldest entries and still saves correctly
+- [x] **Duplicate prevention**: Ensure only one history entry is added per pump cycle (`RUNNING`→`DONE`) even if `DONE` arrives twice
+
+
+### b) Auto-Watering Logic
+- [x] **Auto OFF**: Set `enabled=0`, set dry threshold high → verify it never waters automatically
+- [x] **Threshold boundary test**: Set threshold = current moisture ±1% → verify correct behaviour around edge
+- [x] **Cooldown enforcement**: Force an auto-water event, then ensure no further watering until cooldown 
+- [ ] **Manual + Auto interaction**: Manual water while auto enabled → ensure it doesn’t immediately auto-trigger again on next reading
+
+### c) Sensor + Mapping Validation
+- [x] **Raw vs % sanity**: Log RAW + % before and after watering → % should increase after watering
+- [ ] **Repeatability**: Take 5 readings in the same condition → confirm noise is within a small band (consider averaging if noisy)
+- [ ] **Post-water stabilization**: Compare moisture immediately after watering vs 10 minutes later (expect changes as water spreads)
+
+### d) Failure / Recovery Tests
+- [ ] **WiFi drop recovery**: Turn router off briefly → ESP reconnects and resumes normal operation without watering unexpectedly
+- [ ] **MQTT reconnect**: Restart broker session / force disconnect → device reconnects, resubscribes, and receives retained config
+- [ ] **ESP reboot safety**: Reboot ESP while soil is dry → verify it does NOT water until after it receives config + next scheduled reading (or confirm expected behaviour)
+
+---
 
 ## GPIO & Relay Test
 - [ ] Test the GPIO pin controlling the relay (no pump connected).

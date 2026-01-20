@@ -58,6 +58,8 @@ This firmware is part of a larger **end-to-end IoT system** that includes an And
 - `demo.png` is a screenshot of the pump or app in action.
 - Clicking the image opens the hosted demo video 
 
+![App View](images/appscreenshot.jpg)
+
 ![PCB 3D View](images/demo1.png)
 
 ![PCB View](images/demo2.png)

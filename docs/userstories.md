@@ -6,3 +6,7 @@
 | US02 | As a user, I want a simple app on my phone so that I can water my plant without physically interacting with the pump | - Main screen has a “Water Plant” button  <br> - Button triggers MQTT message  <br> - App provides visual feedback that command was sent | ⬜ |
 | US03 | As a user, I want to know whether the watering was successful so that I can be confident my plant has been watered | - ESP publishes a response message `"DONE"` after watering  <br> - App subscribes to MQTT status topic  <br> - App shows notification or status indicator confirming pump finished | ⬜ |
 | US04 | As a user, I want to see if the watering system is connected to wifi | - App displays a logo to show that the pump is online (green) or offline (red)  | ⬜ |
+| US05 | As a user, I want to view when I last watered my plant | - App date and time of last watering  | ⬜ |
+| US06 | As a user, I want to view my watering history | - App displays past 5 watering history  | ⬜ |
+| US07 | As a user, I want to view moisture readings| - App displays moisture readings taken every so often  | ⬜ |
+| US08 | As a user, I want to be able to automatically water the plant when moisture levels are low | - App can be set so watering automatically happens when moisture levels are low  | ⬜ |
