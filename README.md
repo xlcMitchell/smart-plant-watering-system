@@ -1,76 +1,144 @@
-# ESP8266 Water Pump Controller
+# ESP8266 Water Pump Controller (Smart Plant Watering)
+
+<p align="center">
+  <a href="https://youtu.be/zX-WmBYVB4g">
+    <img src="https://img.youtube.com/vi/zX-WmBYVB4g/hqdefault.jpg" alt="Smart Plant Watering System Demo" width="600">
+  </a>
+  <br>
+  <em>ESP8266 + MQTT + Android app — manual and automated plant watering</em>
+</p>
+
+---
+
+## Overview
+
+This repository contains the **ESP8266 firmware** for a smart plant watering system.
+
+The ESP8266 connects to Wi-Fi, communicates securely with **HiveMQ Cloud (MQTT over TLS)**, and controls a water pump via a relay.  
+It supports both **manual watering** (triggered from an Android app) and **automated watering** based on soil moisture readings and configurable thresholds.
+
+This firmware is part of a larger **end-to-end IoT system** that includes:
+- an Android application
+- MQTT-based messaging
+- system-level testing and documentation
+
+---
 
 ## Component Repositories
 
-- Android App 
- https://github.com/xlcMitchell/WaterPumpApp
-  
+- **Android App (MQTT Publisher & UI)**  
+  https://github.com/xlcMitchell/WaterPumpApp
 
-- ESP8266 Firmware (MQTT Subscriber & Pump Control)  
+- **ESP8266 Firmware (this repository)**  
   https://github.com/xlcMitchell/WaterPumpServer1.0
-
-
-
-## Overview
-This repository contains the **ESP8266 firmware** for a smart plant watering system.  
-The ESP8266 connects to Wi-Fi, subscribes to MQTT commands via **HiveMQ Cloud (TLS)**, and controls a water pump through a relay.
-
-The pump is activated remotely by publishing an MQTT command and is automatically switched off after a fixed duration as a safety measure.
-
-This firmware is part of a larger **end-to-end IoT system** that includes an Android app and system-level documentation.
 
 ---
 
 ## System Behaviour
+
 - ESP8266 connects to Wi-Fi on boot
-- Securely connects to HiveMQ Cloud using MQTT over TLS (port 8883)
-- Subscribes to pump command topic
-- Activates pump for a predefined duration
+- Establishes a secure MQTT connection to HiveMQ Cloud (TLS, port 8883)
+- Publishes **ONLINE/OFFLINE** status using MQTT Last Will and Testament (LWT)
+- Subscribes to pump control and auto-watering configuration topics
+- Reads soil moisture at fixed intervals
+- Controls pump using non-blocking timing logic
+- Automatically shuts off pump after a configured duration (safety)
 
 ---
 
 ## Features
-- MQTT-based remote pump control
-- Secure TLS connection to HiveMQ Cloud
-- Automatic pump shut-off (safety timeout)
+
+- Manual pump control via MQTT
+- Automated watering based on soil moisture threshold
+- Fixed cooldown period to prevent over-watering
+- MQTT retained messages for state recovery
+- Secure MQTT communication over TLS
+- Non-blocking pump control logic
+- Moisture readings published periodically
 - Credentials isolated in `config.h` (excluded from Git)
 
 ---
 
 ## MQTT Topics
-| Topic | Direction | Description |
-|------|----------|------------|
-| `plant/pump/on` | App > ESP8266 | Pump control command (`on`) |
 
+| Topic | Direction | Retained | Description |
+|------|----------|----------|------------|
+| `plant/pump/on` | App → ESP | No | Manual pump command (`on`) |
+| `plant/pump/status` | ESP → App | Yes | Pump state (`IDLE`, `RUNNING`, `DONE`) |
+| `plant/device/online` | ESP → App | Yes | Device online/offline (LWT) |
+| `plant/moisture/reading` | ESP → App | Yes | Soil moisture percentage |
+| `plant/auto/config` | App → ESP | Yes | Auto-watering configuration payload |
 
 ---
 
 ## Hardware Overview
-- ESP8266 Dev Board
-- Relay module (pump switching)
+
+- ESP8266 development board
+- Relay module for pump switching
+- DC water pump
 - External DC power supply
-- Linear regulator (LM7805) for onboard 5V regulation
-- Common ground shared between ESP8266 and pump control circuitry
+- Linear regulator (LM7805) used during early testing
+- Common ground between ESP8266 logic and pump circuitry
+
+> ⚠️ **Note:** Testing identified power instability when using linear regulation from high input voltages.  
+> A buck converter or dedicated regulated supply is recommended for reliable operation.
+
+---
 
 ## Demo
-[![Remote Watering System Demo](https://img.youtube.com/vi/8ZyuyHqKvHw/0.jpg)](https://youtu.be/8ZyuyHqKvHw)
 
-- `demo.png` is a screenshot of the pump or app in action.
-- Clicking the image opens the hosted demo video 
+- Clicking the image above opens a short demo video showing:
+  - Android app control
+  - Pump activation
+  - Moisture updates
+  - Auto-watering behaviour
 
-Below is a screen shot of the application's UI
-
+### Android App UI
 ![App View](images/appscreenshot.jpg)
 
-Designed a custom printed circuit board to control the water pump
+---
+
+## Hardware & PCB
+
+Custom PCB designed to control the water pump and interface directly with the ESP8266.
 
 ![PCB 3D View](images/demo1.png)
+![PCB Top View](images/demo2.png)
 
-![PCB View](images/demo2.png)
-
-The ESP8266 plugs directly into the water pump control board
+ESP8266 plugged directly into the pump control board:
 
 ![PCB With ESP8266](images/demo4.png)
-
 ![PCB Without ESP8266](images/demo5.png)
 
+---
+
+## Documentation
+
+Additional documentation produced for this project:
+- Test & Validation Log
+- Lessons Learned
+- Iteration / Sprint Notes
+- Power Stability Investigation
+- MQTT Topic & Payload Definitions
+
+These documents capture real testing, failures, fixes, and design decisions.
+
+---
+
+## Status
+
+✔ Manual watering implemented  
+✔ Automated watering implemented  
+✔ MQTT connectivity verified  
+✔ Android app integration complete  
+✔ Hardware power issues identified and documented  
+
+---
+
+## Future Improvements
+
+- Persist auto-watering configuration across ESP reboots
+- Sensor calibration and averaging
+- Support for multiple plants
+- Battery + solar power option
+- Improved enclosure and weatherproofing
