@@ -58,11 +58,17 @@ This firmware is part of a larger **end-to-end IoT system** that includes an And
 - `demo.png` is a screenshot of the pump or app in action.
 - Clicking the image opens the hosted demo video 
 
+Below is a screen shot of the application's UI
+
 ![App View](images/appscreenshot.jpg)
+
+Designed a custom printed circuit board to control the water pump
 
 ![PCB 3D View](images/demo1.png)
 
 ![PCB View](images/demo2.png)
+
+The ESP8266 plugs directly into the water pump control board
 
 ![PCB With ESP8266](images/demo4.png)
 
